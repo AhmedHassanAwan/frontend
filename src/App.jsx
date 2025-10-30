@@ -2,8 +2,7 @@ import React from 'react'
 
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-import Login from './pages/Auth/login';
-// import Login from "./Pages/Auth/login";
+import Login from './Pages/Auth/Login'
 import SignUp from "./Pages/Auth/Signup";
 import Home from   "./Pages/Dashboard/Home";
 import Income from "./Pages/Dashboard/Income"
