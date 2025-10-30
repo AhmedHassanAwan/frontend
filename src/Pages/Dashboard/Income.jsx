@@ -1,15 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Sidebar from "../../components/sidebar"; 
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  Tooltip,
-  CartesianGrid,
-} from "recharts";
+import Sidebar from "../../components/sidebar";
+import { ResponsiveContainer, BarChart, Bar, XAxis, Tooltip, CartesianGrid,} from "recharts";
 import { Plus, Download, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -130,9 +123,8 @@ const Income = () => {
 
 
       <main
-        className={`flex-1 transition-all duration-300 p-6 ${
-          open ? "ml-64" : "ml-0"
-        }`}
+        className={`flex-1 transition-all duration-300 p-6 ${open ? "ml-64" : "ml-0"
+          }`}
       >
         <header className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold text-purple-700 mt-4">
@@ -140,7 +132,7 @@ const Income = () => {
           </h2>
         </header>
 
-      
+
         <section className="bg-white rounded-2xl shadow p-6 mb-6">
           <div className="flex justify-between items-start mb-4">
             <div>
@@ -171,7 +163,7 @@ const Income = () => {
           </div>
         </section>
 
-    
+
         <section className="grid grid-cols-1 gap-6">
           <div className="bg-white rounded-2xl shadow p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between">
@@ -266,6 +258,17 @@ const Income = () => {
                     placeholder="💼"
                   />
                 </div>
+
+                <div className="w-full md:w-1/4">
+                  <label className="text-sm text-gray-600">Date</label>
+                  <input
+                    type="date"
+                    value={form.date || new Date().toISOString().split("T")[0]}
+                    onChange={(e) => setForm({ ...form, date: e.target.value })}
+                    className="w-full border rounded-lg px-3 py-2 mt-1"
+                  />
+                </div>
+
 
                 <div className="flex gap-3 ml-auto">
                   <button

@@ -2,14 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../../components/sidebar"; 
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  Tooltip,
-  CartesianGrid,
-} from "recharts";
+import {ResponsiveContainer,AreaChart,Area,XAxis,Tooltip,CartesianGrid,} from "recharts";
 import { Plus, Download, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -241,7 +234,7 @@ const ExpensePage = () => {
 
 
         <dialog id="addModal" className="modal">
-          <div className="modal-box bg-white p-6 rounded-xl shadow">
+          <div className="modal-box bg-white p-6 rounded-2xl shadow">
             <h3 className="text-lg font-medium mb-4">Add New Expense</h3>
             <div className="flex flex-wrap gap-4">
               <input
@@ -264,6 +257,16 @@ const ExpensePage = () => {
                 placeholder="💸"
               />
             </div>
+
+             <div className="w-full md:w-1/4">
+                  <label className="text-sm text-gray-600">Date</label>
+                  <input
+                    type="date"
+                    value={form.date || new Date().toISOString().split("T")[0]}
+                    onChange={(e) => setForm({ ...form, date: e.target.value })}
+                    className="w-full border rounded-lg px-3 py-2 mt-1"
+                  />
+                </div>
 
             <div className="flex justify-end mt-6 gap-3">
               <button
