@@ -28,7 +28,7 @@ function Signup() {
 
     try {
    
-      const res = await axios.post("http://localhost:3000register", {
+      const res = await axios.post("http://localhost:3000/register", {
         fullName:fullname,
         email,
         password,
