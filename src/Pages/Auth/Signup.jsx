@@ -4,7 +4,10 @@ import AuthLayout from '../../components/layouts/AuthLayout';
 import Inputs from '../../components/Inputs/Inputs';
 import ProfilePhotoSelector from '../../components/Inputs/ProfilePhotoSelector';
 import { validateEmail } from '../../utils/helper';
+import { validatePassword } from '../../utils/helper';
 import axios from 'axios';
+import { toast } from "react-toastify";
+
 
 function Signup() {
   const [fullname, setfullname] = useState("");
@@ -22,7 +25,7 @@ function Signup() {
     
     if (!fullname) return seterror("Please enter your full name");
     if (!validateEmail(email)) return seterror("Please enter a valid email address");
-    if (!password) return seterror("Please enter your password");
+    if (!validatePassword(password)) return seterror("Please enter your password");
 
     seterror("");
 
@@ -35,14 +38,15 @@ function Signup() {
         profilePic: profilePicUrl
       });
 
-      console.log(" Signup Successful:", res.data.token);
-      console.log(" Signup Successful:", res.data);
-
-      alert("User Registered Successfully!");
+      // console.log(" Signup Successful:", res.data.token);
+      // console.log(" Signup Successful:", res.data);
+      // alert("User Registered Successfully!");
+          toast.success("Sign Up successful!");
 
      
       navigate("/login");
     } catch (err) {
+      toast.error("Invalid credentials!");
       console.error(" Signup Error:", err.response?.data || err.message);
       seterror(err.response?.data?.message || "Something went wrong. Try again!");
     }
@@ -77,7 +81,7 @@ function Signup() {
             <div className="col-span-2">
               <Inputs
                 type="password"
-                placeholder="Min. 8 characters"
+                placeholder="At least 9 chars, uppercase,lowercase, number & symbol"
                 lable="Password"
                 value={password}
                 onChange={(e) => setpassword(e.target.value)}

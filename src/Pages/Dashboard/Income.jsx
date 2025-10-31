@@ -2,9 +2,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../../components/sidebar";
-import { ResponsiveContainer, BarChart, Bar, XAxis, Tooltip, CartesianGrid,} from "recharts";
+import { ResponsiveContainer, BarChart, Bar, XAxis, Tooltip, CartesianGrid, } from "recharts";
 import { Plus, Download, Trash2 } from "lucide-react";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const API = "http://localhost:3000/income";
@@ -19,7 +19,7 @@ const Income = () => {
     date: "",
   });
   const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(true); // 
+  const [open, setOpen] = useState(true); 
   const navigate = useNavigate();
 
   const loadIncomes = async () => {
@@ -42,6 +42,16 @@ const Income = () => {
 
 
   const handleAdd = async () => {
+
+    if (!form.amount || form.amount <= 0) {
+      toast.error("Amount must be greater than 0");
+      setForm({ ...form, amount: "" })
+      return;
+    }
+    if (!form.source) {
+      toast.error("Sourse is required")
+
+    }
     try {
       setLoading(true);
       await axios.post(
@@ -57,7 +67,11 @@ const Income = () => {
           withCredentials: true,
         }
       );
+
+
       toast.success("Income added!");
+      console.log("Submitting amount:", form.amount);
+
       setForm({ icon: "", amount: "", source: "", date: "" });
       loadIncomes();
     } catch (err) {
@@ -204,7 +218,7 @@ const Income = () => {
 
                   <div className="flex items-center gap-4">
                     <div className="text-green-600 font-medium">
-                      +${inc.amount}
+                      ${inc.amount}
                     </div>
                     <button
                       onClick={() => handleDelete(inc._id)}
@@ -220,7 +234,7 @@ const Income = () => {
           </div>
 
           <dialog id="income_modal" className="modal">
-            <div className="modal-box bg-white max-w-5xl">
+            <div className="modal-box bg-white max-w-xl">
               <div className="bg-white shadow p-6 flex flex-wrap items-end gap-4">
                 <div className="w-full md:w-1/3">
                   <label className="text-sm text-gray-600">Source</label>
@@ -287,12 +301,12 @@ const Income = () => {
                   >
                     Clear
                   </button>
+                  <form method="dialog" className="border px-4 py-2 rounded-lg">
+                    <button>close</button>
+                  </form>
                 </div>
               </div>
             </div>
-            <form method="dialog" className="modal-backdrop">
-              <button>close</button>
-            </form>
           </dialog>
         </section>
       </main>

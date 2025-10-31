@@ -1,20 +1,21 @@
-"use client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Sidebar from "../../components/sidebar"; 
-import {ResponsiveContainer,AreaChart,Area,XAxis,Tooltip,CartesianGrid,} from "recharts";
+import Sidebar from "../../components/sidebar";
+import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip, CartesianGrid, } from "recharts";
 import { Plus, Download, Trash2 } from "lucide-react";
-import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
 
 const API = "http://localhost:3000/expense";
 const Token = () => localStorage.getItem("token") || "";
 
 const ExpensePage = () => {
   const [expenses, setExpenses] = useState([]);
+  const [incomes, setIncomes] = useState([]);
   const [form, setForm] = useState({ category: "", amount: "", icon: "" });
   const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(true); 
+  const [open, setOpen] = useState(true);
   const navigate = useNavigate();
 
   const getToken = () => localStorage.getItem("token") || "";
@@ -24,7 +25,16 @@ const ExpensePage = () => {
     if (!token) navigate("/");
   }, [navigate]);
 
-
+  const loadIncomes = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/income", {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      setIncomes(res.data || []);
+    } catch (err) {
+      console.error("Load incomes error:", err);
+    }
+  };
   const loadExpenses = async () => {
     try {
       const res = await axios.get(`${API}/`, {
@@ -38,15 +48,30 @@ const ExpensePage = () => {
 
   useEffect(() => {
     loadExpenses();
+    loadIncomes();
   }, []);
 
 
+
+  const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0);
+  const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const availableBalance = totalIncome - totalExpense;
+
+
   const handleAdd = async () => {
-    if (!form.category || !form.amount) {
-      toast.error("Please fill all fields");
+    if (!form.amount || form.amount <= 0) {
+      toast.error("Amount must be greater than 0");
+      setForm({ ...form, amount: "" })
       return;
     }
 
+    if (Number(form.amount) > availableBalance) {
+      toast.error("Not enough balance to add this expense!");
+      return;
+    }
+    if (!form.category) {
+      toast.error("require")
+    }
     try {
       setLoading(true);
       await axios.post(
@@ -55,13 +80,14 @@ const ExpensePage = () => {
           icon: form.icon || "💸",
           amount: Number(form.amount),
           category: form.category,
-          date: new Date().toISOString(),
+          date: form.date || new Date().toISOString(),
         },
         { headers: { Authorization: `Bearer ${getToken()}` } }
       );
 
+
       toast.success("Expense added!");
-      setForm({ category: "", amount: "", icon: "" });
+      setForm({ category: "", amount: "", icon: "", data: "" });
       loadExpenses();
     } catch (err) {
       console.error("Add expense error:", err);
@@ -106,6 +132,8 @@ const ExpensePage = () => {
   };
 
 
+
+
   const chartData = expenses.map((item) => ({
     name: new Date(item.date).toLocaleDateString("en-GB", {
       day: "numeric",
@@ -116,14 +144,13 @@ const ExpensePage = () => {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-purple-50 to-white">
- 
+
       <Sidebar open={open} onToggle={setOpen} />
 
-   
+
       <main
-        className={`flex-1 transition-all duration-300 p-6 ${
-          open ? "ml-64" : "ml-0"
-        }`}
+        className={`flex-1 transition-all duration-300 p-6 ${open ? "ml-64" : "ml-0"
+          }`}
       >
         <header className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold text-purple-700 mt-4">
@@ -140,11 +167,19 @@ const ExpensePage = () => {
               </p>
             </div>
             <button
-              className="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50"
               onClick={() => document.getElementById("addModal").showModal()}
+              disabled={totalIncome <= 0}
             >
               <Plus size={16} /> Add Expense
             </button>
+            {totalIncome <= 0 && (
+              <p className="text-sm text-red-500 mt-2">
+                ⚠️ Please add income before adding expenses.
+              </p>
+            )}
+
+
           </div>
 
           <div style={{ height: 320 }}>
@@ -178,7 +213,7 @@ const ExpensePage = () => {
           </div>
         </section>
 
-  
+
         <section className="bg-white rounded-2xl shadow p-6">
           <div className="flex justify-between items-center mb-4">
             <h4 className="text-lg font-medium">All Expenses</h4>
@@ -217,7 +252,7 @@ const ExpensePage = () => {
 
                   <div className="flex items-center gap-4">
                     <div className="text-red-500 font-medium">
-                      -${exp.amount}
+                      ${exp.amount}
                     </div>
                     <button
                       onClick={() => handleDelete(exp._id)}
@@ -235,6 +270,12 @@ const ExpensePage = () => {
 
         <dialog id="addModal" className="modal">
           <div className="modal-box bg-white p-6 rounded-2xl shadow">
+            {availableBalance <= 0 && (
+              <p className="text-sm text-red-500 mt-2">
+                ⚠️ You have no remaining balance. Please add more income.
+              </p>
+            )}
+
             <h3 className="text-lg font-medium mb-4">Add New Expense</h3>
             <div className="flex flex-wrap gap-4">
               <input
@@ -258,15 +299,15 @@ const ExpensePage = () => {
               />
             </div>
 
-             <div className="w-full md:w-1/4">
-                  <label className="text-sm text-gray-600">Date</label>
-                  <input
-                    type="date"
-                    value={form.date || new Date().toISOString().split("T")[0]}
-                    onChange={(e) => setForm({ ...form, date: e.target.value })}
-                    className="w-full border rounded-lg px-3 py-2 mt-1"
-                  />
-                </div>
+            <div className="w-full md:w-1/4">
+              <label className="text-sm text-gray-600">Date</label>
+              <input
+                type="date"
+                value={form.date || new Date().toISOString().split("T")[0]}
+                onChange={(e) => setForm({ ...form, date: e.target.value })}
+                className="w-full border rounded-lg px-3 py-2 mt-1"
+              />
+            </div>
 
             <div className="flex justify-end mt-6 gap-3">
               <button

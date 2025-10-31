@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from '../../components/sidebar'
-import {PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,} from "recharts";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend, } from "recharts";
 import { ArrowUpCircle, ArrowDownCircle, DollarSign } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -10,14 +10,14 @@ const API_INCOME = "http://localhost:3000/income";
 const API_EXPENSE = "http://localhost:3000/expense";
 const Token = () => localStorage.getItem("token") || "";
 
-const COLORS = ["#7C3AED", "#F43F5E"]; // Purple for income, red for expense
+const COLORS = ["#7C3AED", "#F43F5E"];
 
 const Dashboard = () => {
   const [income, setIncome] = useState([]);
   const [expense, setExpense] = useState([]);
-  const [open, setOpen] = useState(true); 
+  const [open, setOpen] = useState(true);
 
-    const fetchIncome = async () => {
+  const fetchIncome = async () => {
     try {
       const res = await axios.get(`${API_INCOME}/`, {
         headers: { Authorization: `Bearer ${Token()}` },
@@ -29,7 +29,7 @@ const Dashboard = () => {
     }
   };
 
-  
+
   const fetchExpense = async () => {
     try {
       const res = await axios.get(`${API_EXPENSE}/`, {
@@ -62,14 +62,13 @@ const Dashboard = () => {
 
       <Sidebar open={open} onToggle={setOpen} />
 
-  
+
       <main
-        className={`flex-1 transition-all duration-300 p-6 ${
-          open ? "ml-64" : "ml-0"
-        }`}
+        className={`flex-1 transition-all duration-300 p-6 ${open ? "ml-64" : "ml-0"
+          }`}
       >
         <div className="max-w-6xl mx-auto">
-        
+
           <header className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-semibold text-purple-700">
               Dashboard Overview
@@ -104,16 +103,15 @@ const Dashboard = () => {
                 <DollarSign className="text-purple-500" size={20} />
               </div>
               <div
-                className={`text-2xl font-semibold ${
-                  balance >= 0 ? "text-purple-700" : "text-red-600"
-                }`}
+                className={`text-2xl font-semibold ${balance >= 0 ? "text-purple-700" : "text-red-600"
+                  }`}
               >
                 ${balance.toLocaleString()}
               </div>
             </div>
           </div>
 
-   
+
           <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-center">
             <h3 className="text-xl font-medium text-gray-700 mb-2">
               Income vs Expense

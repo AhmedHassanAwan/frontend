@@ -3,13 +3,16 @@ import AuthLayout from '../../components/layouts/AuthLayout';
 import { Link, useNavigate } from 'react-router-dom';
 import Inputs from '../../components/Inputs/Inputs';
 import { validateEmail } from '../../utils/helper';
+import { validatePassword } from '../../utils/helper';
 import axios from 'axios';
+import { toast } from "react-toastify";
 
 function Login() {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [error, seterror] = useState("");
   const navigate = useNavigate();
+
 
   const handlelogin = async (e) => {
     e.preventDefault();
@@ -18,7 +21,7 @@ function Login() {
       seterror("Please enter a valid email address");
       return;
     }
-    if (!password) {
+    if (!validatePassword(password)) {
       seterror("Please enter your password");
       return;
     }
@@ -31,14 +34,15 @@ function Login() {
         password
       });
 
-      console.log("Login Response:", res.data);
+      // console.log("Login Response:", res.data);
 
       localStorage.setItem("token", res.data.token);
+      toast.success("Login successful!");
 
-      alert("Login Successful!");
       navigate("/dashboard");
 
     } catch (err) {
+      toast.error("Invalid credentials!");
       console.error(" Login Error:", err.response?.data || err.message);
       seterror(err.response?.data?.message || "Something went wrong. Try again!");
     }
@@ -63,7 +67,7 @@ function Login() {
 
           <Inputs
             type="password"
-            placeholder="Min. 8 characters"
+            placeholder="At least 9 chars,  uppercase,  lowercase,  number & symbol"
             lable="Password"
             value={password}
             onChange={(e) => setpassword(e.target.value)}
