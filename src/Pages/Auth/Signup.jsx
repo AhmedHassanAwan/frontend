@@ -38,10 +38,7 @@ function Signup() {
         profilePic: profilePicUrl
       });
 
-      // console.log(" Signup Successful:", res.data.token);
-      // console.log(" Signup Successful:", res.data);
-      // alert("User Registered Successfully!");
-          toast.success("Sign Up successful!");
+      toast.success("Sign Up successful!");
 
      
       navigate("/login");

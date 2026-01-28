@@ -145,13 +145,16 @@ const ExpensePage = () => {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-purple-50 to-white">
 
-      <Sidebar open={open} onToggle={setOpen} />
+    
+         <Sidebar active="dashboard" open={open} />
 
 
-      <main
-        className={`flex-1 transition-all duration-300 p-6 ${open ? "ml-64" : "ml-0"
-          }`}
-      >
+   
+
+
+
+
+      <main className={`flex-1 p-6 transition-all duration-300 ${open ? "ml-64" : "ml-0"}`}>
         <header className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold text-purple-700 mt-4">
             Expense Overview

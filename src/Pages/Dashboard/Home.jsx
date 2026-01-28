@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Menu, X } from "lucide-react"; 
 import Sidebar from '../../components/sidebar'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend, } from "recharts";
 import { ArrowUpCircle, ArrowDownCircle, DollarSign } from "lucide-react";
@@ -60,13 +61,23 @@ const Dashboard = () => {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-purple-50 to-white">
 
-      <Sidebar open={open} onToggle={setOpen} />
+  
+
+         <Sidebar active="dashboard" open={open} />
 
 
-      <main
-        className={`flex-1 transition-all duration-300 p-6 ${open ? "ml-64" : "ml-0"
-          }`}
-      >
+    <button
+  onClick={() => setOpen(!open)}
+  className="md:hidden fixed top-4 left-4 bg-purple-600 text-white p-2 rounded-lg shadow-lg z-50"
+>
+  {open ? <X size={22} /> : <Menu size={22} />}
+</button>
+
+
+
+
+      <main className={`flex-1 p-6 transition-all duration-300 ${open ? "ml-64" : "ml-0"}`}>
+      
         <div className="max-w-6xl mx-auto">
 
           <header className="flex items-center justify-between mb-8">

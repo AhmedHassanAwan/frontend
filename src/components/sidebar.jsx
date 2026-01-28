@@ -1,8 +1,10 @@
-import React from "react";
+
+
 import { useNavigate } from "react-router-dom";
 import { Home, Wallet, TrendingUp, LogOut } from "lucide-react";
 
-const Sidebar = ({ active }) => {
+
+const Sidebar = ({ active, open }) => {
   const navigate = useNavigate();
 
   const navItems = [
@@ -11,13 +13,11 @@ const Sidebar = ({ active }) => {
     { icon: <Wallet size={20} />, label: "Expense", path: "/expense" },
   ];
 
-  const handleLogout = () => {
-    localStorage.removeItem("token"); 
-    navigate("/"); 
-  };
-
   return (
-    <div className="h-screen w-64 bg-white shadow-lg text-black flex flex-col justify-between py-6 px-4 fixed left-0 top-0">
+    <div
+      className={`h-screen w-64 bg-white shadow-lg text-black flex flex-col justify-between py-6 px-4 fixed left-0 top-0 transition-transform duration-300
+      ${open ? "translate-x-0" : "-translate-x-full"}`}
+    >
       <div>
         <h1 className="text-2xl font-bold mb-8 text-center text-purple-700">
           Expense Tracker
@@ -28,11 +28,12 @@ const Sidebar = ({ active }) => {
             <button
               key={item.label}
               onClick={() => navigate(item.path)}
-              className={`flex items-center gap-3 p-3 rounded-lg text-left transition-all duration-200 w-full ${
-                active === item.label.toLowerCase()
-                  ? "bg-purple-100 text-purple-700 font-semibold"
-                  : "hover:bg-purple-600 hover:text-white"
-              }`}
+              className={`flex items-center gap-3 p-3 rounded-lg w-full transition-all 
+                ${
+                  active === item.label.toLowerCase()
+                    ? "bg-purple-100 text-purple-700 font-semibold"
+                    : "hover:bg-purple-600 hover:text-white"
+                }`}
             >
               {item.icon}
               <span>{item.label}</span>
@@ -41,17 +42,19 @@ const Sidebar = ({ active }) => {
         </nav>
       </div>
 
-      <div className="border-t border-gray-200 pt-4">
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 p-3 w-full rounded-lg text-left text-red-500 hover:bg-red-100 transition-all duration-200"
-        >
-          <LogOut size={20} />
-          <span className="font-medium">Logout</span>
-        </button>
-      </div>
+      <button
+        onClick={() => {
+          localStorage.removeItem("token");
+          navigate("/");
+        }}
+        className="flex items-center gap-3 p-3 w-full rounded-lg text-red-500 hover:bg-red-100"
+      >
+        <LogOut size={20} />
+        Logout
+      </button>
     </div>
   );
 };
 
-export default Sidebar;
+
+export default Sidebar
