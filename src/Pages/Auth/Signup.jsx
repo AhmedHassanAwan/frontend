@@ -7,6 +7,7 @@ import { validateEmail } from '../../utils/helper';
 import { validatePassword } from '../../utils/helper';
 import axios from 'axios';
 import { toast } from "react-toastify";
+import API from '../../api/api.js';
 
 
 function Signup() {
@@ -31,7 +32,7 @@ function Signup() {
 
     try {
    
-      const res = await axios.post("http://localhost:3000/register", {
+      const res = await API.post("/register", {
         fullName:fullname,
         email,
         password,

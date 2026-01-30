@@ -1,21 +1,10 @@
-import axios from "axios";
 
-const API = axios.create({
-  baseURL: "http://localhost:3000/api/v1", 
-});
-const token = localStorage.getItem("token");
-
-
-
+import API from "../api/api";
 
 export const getIncome = async () => {
-  const res = await API.get("/income", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const res = await API.get("/income");
   return res.data.incomes;
-}
+};
 
 export const getMonthlyIncome = async () => {
   const res = await API.get("/income/monthly");

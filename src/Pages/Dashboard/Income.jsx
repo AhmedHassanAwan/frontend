@@ -7,8 +7,10 @@ import { Plus, Download, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-const API = "http://localhost:3000/income";
-const Token = () => localStorage.getItem("token") || "";
+const BASE_URL = "http://15.206.198.248:3000";
+
+const getToken = () => localStorage.getItem("token") || "";
+
 
 const Income = () => {
   const [incomes, setIncomes] = useState([]);
@@ -22,19 +24,19 @@ const Income = () => {
   const [open, setOpen] = useState(true); 
   const navigate = useNavigate();
 
-  const loadIncomes = async () => {
-    try {
-      const res = await axios.get(`${API}/`, {
-        headers: {
-          Authorization: `Bearer ${Token()}`,
-          credentials: "include",
-        },
-      });
-      setIncomes(res.data || []);
-    } catch (err) {
-      console.error("Load incomes error:", err);
-    }
-  };
+const loadIncomes = async () => {
+  try {
+    const res = await axios.get(`${BASE_URL}/income`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    setIncomes(res.data || []);
+  } catch (err) {
+    console.error("Load incomes error:", err);
+  }
+};
+
 
   useEffect(() => {
     loadIncomes();
@@ -54,19 +56,21 @@ const Income = () => {
     }
     try {
       setLoading(true);
-      await axios.post(
-        `${API}/`,
-        {
-          icon: form.icon || "💼",
-          amount: Number(form.amount),
-          source: form.source,
-          date: form.date || new Date().toISOString(),
-        },
-        {
-          headers: { Authorization: `Bearer ${Token()}` },
-          withCredentials: true,
-        }
-      );
+   await axios.post(
+  `${BASE_URL}/income`,
+  {
+    icon: form.icon || "💼",
+    amount: Number(form.amount),
+    source: form.source,
+    date: form.date || new Date().toISOString(),
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  }
+);
+
 
 
       toast.success("Income added!");
@@ -85,10 +89,12 @@ const Income = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API}/${id}`, {
-        headers: { Authorization: `Bearer ${Token()}` },
-        withCredentials: true,
-      });
+     await axios.delete(`${BASE_URL}/income/${id}`, {
+  headers: {
+    Authorization: `Bearer ${getToken()}`,
+  },
+});
+
       await loadIncomes();
       toast.success("Income deleted!");
     } catch (err) {
@@ -100,11 +106,13 @@ const Income = () => {
 
   const handleDownload = async () => {
     try {
-      const response = await axios.get(`${API}/download`, {
-        responseType: "blob",
-        headers: { Authorization: `Bearer ${Token()}` },
-        withCredentials: true,
-      });
+    const response = await axios.get(`${BASE_URL}/income/download`, {
+  responseType: "blob",
+  headers: {
+    Authorization: `Bearer ${getToken()}`,
+  },
+});
+
 
       const fileUrl = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");

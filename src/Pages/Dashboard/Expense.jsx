@@ -5,10 +5,9 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip, CartesianGrid, } 
 import { Plus, Download, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import API from '../../api/api.js';
 
 
-const API = "http://localhost:3000/expense";
-const Token = () => localStorage.getItem("token") || "";
 
 const ExpensePage = () => {
   const [expenses, setExpenses] = useState([]);
@@ -25,26 +24,23 @@ const ExpensePage = () => {
     if (!token) navigate("/");
   }, [navigate]);
 
-  const loadIncomes = async () => {
-    try {
-      const res = await axios.get("http://localhost:3000/income", {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
-      setIncomes(res.data || []);
-    } catch (err) {
-      console.error("Load incomes error:", err);
-    }
-  };
-  const loadExpenses = async () => {
-    try {
-      const res = await axios.get(`${API}/`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
-      setExpenses(res.data || []);
-    } catch (err) {
-      console.error("Load expenses error:", err);
-    }
-  };
+ const loadIncomes = async () => {
+  try {
+    const res = await API.get("/income");
+    setIncomes(res.data || []);
+  } catch (err) {
+    console.error("Load incomes error:", err);
+  }
+};
+
+const loadExpenses = async () => {
+  try {
+    const res = await API.get("/expense");
+    setExpenses(res.data || []);
+  } catch (err) {
+    console.error("Load expenses error:", err);
+  }
+};
 
   useEffect(() => {
     loadExpenses();
@@ -74,16 +70,12 @@ const ExpensePage = () => {
     }
     try {
       setLoading(true);
-      await axios.post(
-        `${API}/`,
-        {
-          icon: form.icon || "💸",
-          amount: Number(form.amount),
-          category: form.category,
-          date: form.date || new Date().toISOString(),
-        },
-        { headers: { Authorization: `Bearer ${getToken()}` } }
-      );
+     await API.post("/expense", {
+  icon: form.icon || "💸",
+  amount: Number(form.amount),
+  category: form.category,
+  date: form.date || new Date().toISOString(),
+});
 
 
       toast.success("Expense added!");
@@ -100,9 +92,7 @@ const ExpensePage = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API}/${id}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
+    await API.delete(`/expense/${id}`);
       toast.success("Expense deleted!");
       loadExpenses();
     } catch (err) {
@@ -113,10 +103,9 @@ const ExpensePage = () => {
 
   const handleDownload = async () => {
     try {
-      const response = await axios.get(`${API}/download`, {
-        responseType: "blob",
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
+     const response = await API.get("/expense/download", {
+  responseType: "blob",
+});
 
       const fileUrl = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");

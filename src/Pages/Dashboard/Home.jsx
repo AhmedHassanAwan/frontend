@@ -7,9 +7,10 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend, } from "rech
 import { ArrowUpCircle, ArrowDownCircle, DollarSign } from "lucide-react";
 import { toast } from "react-toastify";
 
-const API_INCOME = "http://localhost:3000/income";
-const API_EXPENSE = "http://localhost:3000/expense";
-const Token = () => localStorage.getItem("token") || "";
+const BASE_URL = "http://15.206.198.248:3000";
+const getToken = () => localStorage.getItem("token") || "";
+
+
 
 const COLORS = ["#7C3AED", "#F43F5E"];
 
@@ -18,30 +19,36 @@ const Dashboard = () => {
   const [expense, setExpense] = useState([]);
   const [open, setOpen] = useState(true);
 
-  const fetchIncome = async () => {
-    try {
-      const res = await axios.get(`${API_INCOME}/`, {
-        headers: { Authorization: `Bearer ${Token()}` },
-      });
-      setIncome(res.data || []);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load income data");
-    }
-  };
+const fetchIncome = async () => {
+  try {
+    const res = await axios.get(`${BASE_URL}/income`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    setIncome(res.data || []);
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to load income data");
+  }
+};
 
 
-  const fetchExpense = async () => {
-    try {
-      const res = await axios.get(`${API_EXPENSE}/`, {
-        headers: { Authorization: `Bearer ${Token()}` },
-      });
-      setExpense(res.data || []);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load expense data");
-    }
-  };
+
+const fetchExpense = async () => {
+  try {
+    const res = await axios.get(`${BASE_URL}/expense`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    setExpense(res.data || []);
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to load expense data");
+  }
+};
+
 
   useEffect(() => {
     fetchIncome();

@@ -6,6 +6,7 @@ import { validateEmail } from '../../utils/helper';
 import { validatePassword } from '../../utils/helper';
 import axios from 'axios';
 import { toast } from "react-toastify";
+import API from '../../api/api.js';
 
 function Login() {
   const [email, setemail] = useState("");
@@ -29,10 +30,10 @@ function Login() {
     seterror("");
 
     try {
-      const res = await axios.post("http://localhost:3000/login", {
-        email,
-        password
-      });
+     const res = await API.post("/login", {
+  email,
+  password,
+});
 
       // console.log("Login Response:", res.data);
 
