@@ -7,8 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import API from '../../api/api.js';
 
-
-
 const ExpensePage = () => {
   const [expenses, setExpenses] = useState([]);
   const [incomes, setIncomes] = useState([]);
@@ -24,12 +22,16 @@ const ExpensePage = () => {
     if (!token) navigate("/");
   }, [navigate]);
 
- const loadIncomes = async () => {
+
+
+
+
+const loadIncomes = async () => {
   try {
     const res = await API.get("/income");
     setIncomes(res.data || []);
   } catch (err) {
-    console.error("Load incomes error:", err);
+    toast.error("Failed to load incomes");
   }
 };
 
@@ -37,15 +39,15 @@ const loadExpenses = async () => {
   try {
     const res = await API.get("/expense");
     setExpenses(res.data || []);
-  } catch (err) {
-    console.error("Load expenses error:", err);
+  } catch {
+    toast.error("Failed to load expenses");
   }
 };
 
-  useEffect(() => {
-    loadExpenses();
-    loadIncomes();
-  }, []);
+useEffect(() => {
+  loadIncomes();
+  loadExpenses();
+}, []);
 
 
 
@@ -54,72 +56,78 @@ const loadExpenses = async () => {
   const availableBalance = totalIncome - totalExpense;
 
 
-  const handleAdd = async () => {
-    if (!form.amount || form.amount <= 0) {
-      toast.error("Amount must be greater than 0");
-      setForm({ ...form, amount: "" })
-      return;
-    }
 
-    if (Number(form.amount) > availableBalance) {
-      toast.error("Not enough balance to add this expense!");
-      return;
-    }
-    if (!form.category) {
-      toast.error("require")
-    }
-    try {
-      setLoading(true);
-     await API.post("/expense", {
-  icon: form.icon || "💸",
-  amount: Number(form.amount),
-  category: form.category,
-  date: form.date || new Date().toISOString(),
-});
+const handleAdd = async () => {
+  if (!form.amount || form.amount <= 0) {
+    toast.error("Amount must be greater than 0");
+    return;
+  }
+
+  if (!form.category.trim()) {
+    toast.error("Category is required");
+    return;
+  }
+
+  if (Number(form.amount) > availableBalance) {
+    toast.error("Not enough balance!");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    await API.post("/expense", {
+      icon: form.icon || "💸",
+      amount: Number(form.amount),
+      category: form.category,
+      date: form.date ? new Date(form.date).toISOString() : undefined,
+    });
+
+    toast.success("Expense added!");
+    setForm({ category: "", amount: "", icon: "", date: "" });
+    loadExpenses();
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Failed to add expense");
+  } finally {
+    setLoading(false);
+  }
+};
 
 
-      toast.success("Expense added!");
-      setForm({ category: "", amount: "", icon: "", data: "" });
-      loadExpenses();
-    } catch (err) {
-      console.error("Add expense error:", err);
-      toast.error(err.response?.data?.message || "Failed to add expense");
-    } finally {
-      setLoading(false);
-    }
-  };
 
 
   const handleDelete = async (id) => {
-    try {
+  try {
     await API.delete(`/expense/${id}`);
-      toast.success("Expense deleted!");
-      loadExpenses();
-    } catch (err) {
-      console.error("Delete expense error:", err);
-      toast.error("Failed to delete expense");
-    }
-  };
+    toast.success("Expense deleted!");
+    loadExpenses();
+  } catch {
+    toast.error("Failed to delete expense");
+  }
+};
 
-  const handleDownload = async () => {
-    try {
-     const response = await API.get("/expense/download", {
-  responseType: "blob",
-});
 
-      const fileUrl = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = fileUrl;
-      link.download = "expenses.xlsx";
-      link.click();
 
-      toast.success("Expenses downloaded!");
-    } catch (error) {
-      console.error("Error downloading file:", error);
-      toast.error("Failed to download file.");
-    }
-  };
 
+
+
+const handleDownload = async () => {
+  try {
+    const res = await API.get("/expense/download", {
+      responseType: "blob",
+    });
+
+    const url = window.URL.createObjectURL(new Blob([res.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "expenses.xlsx";
+    link.click();
+
+    toast.success("Expenses downloaded!");
+  } catch {
+    toast.error("Download failed");
+  }
+};
 
 
 
@@ -136,12 +144,6 @@ const loadExpenses = async () => {
 
     
          <Sidebar active="dashboard" open={open} />
-
-
-   
-
-
-
 
       <main className={`flex-1 p-6 transition-all duration-300 ${open ? "ml-64" : "ml-0"}`}>
         <header className="flex items-center justify-between mb-6">

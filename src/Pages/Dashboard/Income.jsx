@@ -6,11 +6,10 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, Tooltip, CartesianGrid, } fr
 import { Plus, Download, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import API from '../../api/api.js';
 
-const BASE_URL = "http://15.206.198.248:3000";
-
-const getToken = () => localStorage.getItem("token") || "";
-
+// const BASE_URL = "https://backend-expense.duckdns.org/";
+// const getToken = () => localStorage.getItem("token") || "";
 
 const Income = () => {
   const [incomes, setIncomes] = useState([]);
@@ -24,16 +23,14 @@ const Income = () => {
   const [open, setOpen] = useState(true); 
   const navigate = useNavigate();
 
+
 const loadIncomes = async () => {
   try {
-    const res = await axios.get(`${BASE_URL}/income`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
+    const res = await API.get("/income");
     setIncomes(res.data || []);
   } catch (err) {
-    console.error("Load incomes error:", err);
+    console.error(err);
+    toast.error("Failed to load incomes");
   }
 };
 
@@ -43,91 +40,74 @@ const loadIncomes = async () => {
   }, []);
 
 
-  const handleAdd = async () => {
 
-    if (!form.amount || form.amount <= 0) {
-      toast.error("Amount must be greater than 0");
-      setForm({ ...form, amount: "" })
-      return;
-    }
-    if (!form.source) {
-      toast.error("Sourse is required")
-
-    }
-    try {
-      setLoading(true);
-   await axios.post(
-  `${BASE_URL}/income`,
-  {
-    icon: form.icon || "💼",
-    amount: Number(form.amount),
-    source: form.source,
-    date: form.date || new Date().toISOString(),
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
-    },
+const handleAdd = async () => {
+  if (!form.amount || form.amount <= 0) {
+    toast.error("Amount must be greater than 0");
+    return;
   }
-);
+
+  if (!form.source.trim()) {
+    toast.error("Source is required");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    await API.post("/income", {
+      icon: form.icon || "💼",
+      amount: Number(form.amount),
+      source: form.source,
+      date: form.date ? new Date(form.date).toISOString() : undefined,
+    });
+
+    toast.success("Income added!");
+    setForm({ source: "", amount: "", icon: "", date: "" });
+    loadIncomes();
+  } catch (err) {
+    console.error(err);
+    toast.error(err.response?.data?.message || "Failed to add income");
+  } finally {
+    setLoading(false);
+  }
+};
 
 
 
-      toast.success("Income added!");
-      console.log("Submitting amount:", form.amount);
+const handleDelete = async (id) => {
+  try {
+    await API.delete(`/income/${id}`);
+    toast.success("Income deleted!");
+    loadIncomes();
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to delete income");
+  }
+};
 
-      setForm({ icon: "", amount: "", source: "", date: "" });
-      loadIncomes();
-    } catch (err) {
-      console.error("Add income error:", err);
-      toast.error(err.response?.data?.message || "Failed to add income");
-    } finally {
-      setLoading(false);
-    }
-  };
+const handleDownload = async () => {
+  try {
+    const res = await API.get("/income/download", {
+      responseType: "blob",
+    });
 
+    const url = window.URL.createObjectURL(new Blob([res.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "income.xlsx";
+    link.click();
 
-  const handleDelete = async (id) => {
-    try {
-     await axios.delete(`${BASE_URL}/income/${id}`, {
-  headers: {
-    Authorization: `Bearer ${getToken()}`,
-  },
-});
-
-      await loadIncomes();
-      toast.success("Income deleted!");
-    } catch (err) {
-      console.error("Delete income error:", err);
-      toast.error(err.response?.data?.message || "Failed to delete income");
-    }
-  };
-
-
-  const handleDownload = async () => {
-    try {
-    const response = await axios.get(`${BASE_URL}/income/download`, {
-  responseType: "blob",
-  headers: {
-    Authorization: `Bearer ${getToken()}`,
-  },
-});
+    toast.success("File downloaded");
+  } catch (err) {
+    console.error(err);
+    toast.error("Download failed");
+  }
+};
 
 
-      const fileUrl = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = fileUrl;
-      link.download = "income.xlsx";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
 
-      toast.success("Income file downloaded successfully!");
-    } catch (error) {
-      console.error("Error downloading file:", error);
-      toast.error("Couldn't download the file. Please try again.");
-    }
-  };
+
 
 
   const chartData = incomes.map((i) => ({

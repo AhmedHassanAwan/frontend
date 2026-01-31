@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://15.206.198.248:3000",
+  baseURL: "https://backend-expense.duckdns.org/",
 });
 
 // token interceptor (auto header)

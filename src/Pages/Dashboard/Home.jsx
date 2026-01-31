@@ -6,9 +6,9 @@ import Sidebar from '../../components/sidebar'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend, } from "recharts";
 import { ArrowUpCircle, ArrowDownCircle, DollarSign } from "lucide-react";
 import { toast } from "react-toastify";
+import API from '../../api/api.js';
 
-const BASE_URL = "http://15.206.198.248:3000";
-const getToken = () => localStorage.getItem("token") || "";
+
 
 
 
@@ -19,13 +19,13 @@ const Dashboard = () => {
   const [expense, setExpense] = useState([]);
   const [open, setOpen] = useState(true);
 
+
+
+
+
 const fetchIncome = async () => {
   try {
-    const res = await axios.get(`${BASE_URL}/income`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
+    const res = await API.get("/income");
     setIncome(res.data || []);
   } catch (err) {
     console.error(err);
@@ -35,20 +35,16 @@ const fetchIncome = async () => {
 
 
 
+
 const fetchExpense = async () => {
   try {
-    const res = await axios.get(`${BASE_URL}/expense`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
+    const res = await API.get("/expense");
     setExpense(res.data || []);
   } catch (err) {
     console.error(err);
     toast.error("Failed to load expense data");
   }
 };
-
 
   useEffect(() => {
     fetchIncome();
