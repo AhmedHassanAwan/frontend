@@ -8,9 +8,6 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import API from '../../api/api.js';
 
-// const BASE_URL = "https://backend-expense.duckdns.org/";
-// const getToken = () => localStorage.getItem("token") || "";
-
 const Income = () => {
   const [incomes, setIncomes] = useState([]);
   const [form, setForm] = useState({

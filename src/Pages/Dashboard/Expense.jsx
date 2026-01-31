@@ -22,10 +22,6 @@ const ExpensePage = () => {
     if (!token) navigate("/");
   }, [navigate]);
 
-
-
-
-
 const loadIncomes = async () => {
   try {
     const res = await API.get("/income");

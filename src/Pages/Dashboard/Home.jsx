@@ -8,20 +8,12 @@ import { ArrowUpCircle, ArrowDownCircle, DollarSign } from "lucide-react";
 import { toast } from "react-toastify";
 import API from '../../api/api.js';
 
-
-
-
-
 const COLORS = ["#7C3AED", "#F43F5E"];
 
 const Dashboard = () => {
   const [income, setIncome] = useState([]);
   const [expense, setExpense] = useState([]);
   const [open, setOpen] = useState(true);
-
-
-
-
 
 const fetchIncome = async () => {
   try {
